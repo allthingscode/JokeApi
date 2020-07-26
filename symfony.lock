@@ -1,4 +1,7 @@
 {
+    "api-platform/api-pack": {
+        "version": "v1.2.2"
+    },
     "composer/package-versions-deprecated": {
         "version": "1.10.99"
     },
@@ -84,6 +87,9 @@
     "egulias/email-validator": {
         "version": "2.1.18"
     },
+    "exsyst/swagger": {
+        "version": "v0.4.1"
+    },
     "laminas/laminas-code": {
         "version": "3.4.1"
     },
@@ -95,6 +101,19 @@
     },
     "monolog/monolog": {
         "version": "2.1.1"
+    },
+    "nelmio/api-doc-bundle": {
+        "version": "3.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "c8e0c38e1a280ab9e37587a8fa32b251d5bc1c94"
+        },
+        "files": [
+            "./config/packages/nelmio_api_doc.yaml",
+            "./config/routes/nelmio_api_doc.yaml"
+        ]
     },
     "nikic/php-parser": {
         "version": "v4.6.0"

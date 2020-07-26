@@ -2,7 +2,11 @@ index:
     path: /
     controller: App\Controller\DefaultController::index
 
-
+# config/routes.yaml
+app.swagger_ui:
+    path: /doc
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
 
 ## Joke Routes
 
@@ -27,12 +31,13 @@ api.joke.put:
     requirements:
         jokeId:  '\d+'
 
+api.joke.getRandom:
+    path: /joke/random
+    controller: App\Controller\JokeController::getRandom
+    methods:  GET
+
 api.joke.post:
     path: /joke
     controller: App\Controller\JokeController::add
     methods:  POST
 
-api.joke.getRandom:
-    path: /joke
-    controller: App\Controller\JokeController::getRandom
-    methods:  GET

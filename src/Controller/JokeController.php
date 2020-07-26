@@ -4,13 +4,13 @@
 namespace App\Controller;
 
 use App\Entity\Joke;
-use OpenApi\Annotations as OA;
+use Swagger\Annotations AS OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 
-
+//@OA\Info(title="My Joke API", version="0.1")
 /**
  * Class JokeController
  * @package App\Controller
@@ -21,11 +21,21 @@ class JokeController extends AbstractController
     /**
      * @OA\Post(
      *
-     *     tags={"/jokes"},
+     *     path="/joke",
      *     description="Add A New Joke",
      *     operationId="Add Joke",
      *
-     *     @OA\Parameter(name="joke", in="body", @OA\Schema(type="string")),
+     *     @OA\Parameter(
+     *         name="joke",
+     *         in="body",
+     *         required=true,
+     *         type="json",
+     *         @OA\Schema(
+     *             type="object",
+     *             required={"joke"},
+     *             @OA\Property(property="joke", type="string", example="Why did the chicken cross the road?"),
+     *         )
+     *     ),
      *
      *     @OA\Response(response="200", description="Joke added successfully"),
      *     @OA\Response(response="400", description="Request is Not Valid")
@@ -65,12 +75,22 @@ class JokeController extends AbstractController
     /**
      * @OA\Put(
      *
-     *     tags={"/jokes"},
+     *     path="/joke/{jokeId}",
      *     description="Update an Existing Joke",
      *     operationId="Update Joke",
      *
-     *     @OA\Parameter(name="jokeId", in="query", @OA\Schema(type="integer")),
-     *     @OA\Parameter(name="joke",   in="body",  @OA\Schema(type="string")),
+     *     @OA\Parameter(name="jokeId", in="path", required=true, type="integer"),
+     *     @OA\Parameter(
+     *         name="joke",
+     *         in="body",
+     *         required=true,
+     *         type="json",
+     *         @OA\Schema(
+     *             type="object",
+     *             required={"joke"},
+     *             @OA\Property(property="joke", type="string", example="Why did the chicken cross the road?"),
+     *         )
+     *     ),
      *
      *     @OA\Response(response="200", description="Joke updated successfully"),
      *     @OA\Response(response="400", description="Request is Not Valid"),
@@ -121,11 +141,11 @@ class JokeController extends AbstractController
     /**
      * @OA\Get(
      *
-     *     tags={"/jokes"},
+     *     path="/joke/{jokeId}",
      *     description="Get a Specific Joke",
      *     operationId="Get Joke",
      *
-     *     @OA\Parameter(name="jokeId", in="query", @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="jokeId", required=true, in="path", type="integer"),
      *
      *     @OA\Response(response="200", description="Joke retrieved successfully"),
      *     @OA\Response(response="400", description="Request is Not Valid"),
@@ -133,7 +153,6 @@ class JokeController extends AbstractController
      *
      * )
      *
-     * @param Request $request
      * @param int $jokeId
      * @return JsonResponse
      */
@@ -161,7 +180,7 @@ class JokeController extends AbstractController
     /**
      * @OA\Get(
      *
-     *     tags={"/jokes"},
+     *     path="/joke/random",
      *     description="Get a Random Joke",
      *     operationId="Get Any Joke",
      *
@@ -203,11 +222,11 @@ class JokeController extends AbstractController
     /**
      * @OA\Delete(
      *
-     *     tags={"/jokes"},
+     *     path="/joke/{jokeId}",
      *     description="Delete a Specific Joke",
      *     operationId="Delete Joke",
      *
-     *     @OA\Parameter(name="jokeId", in="query", @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="jokeId", in="path", required=true, type="integer"),
      *
      *     @OA\Response(response="200", description="Joke Deleted Successfully"),
      *     @OA\Response(response="400", description="Request is Not Valid"),
