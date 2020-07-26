@@ -241,14 +241,26 @@ class JokeController extends AbstractController
      *     description="Get a Collection of Jokes",
      *     operationId="Get Jokes",
      *
-     *     @OA\Parameter(name="limit",  required=true,  in="query", type="integer"),
-     *     @OA\Parameter(name="offset", required=false, in="query", type="integer", default=0),
+     *     @OA\Parameter(name="page",         required=true, in="query", type="integer"),
+     *     @OA\Parameter(name="itemsPerPage", required=true, in="query", type="integer"),
      *
      *     @OA\Response(
      *         response="200",
      *         description="Jokes Retrieved Successfully",
-     *         @OA\Schema(type="array",
-     *             @OA\Items(ref=@Model(type=Joke::class))
+     *
+     *         @OA\Schema(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="meta",
+     *                 @OA\Property(property="page",         type="integer", example=1),
+     *                 @OA\Property(property="itemsPerPage", type="integer", example=5),
+     *                 @OA\Property(property="total",        type="integer", example=5)
+     *             ),
+     *             @OA\Property(
+     *                 property="jokes",
+     *                 type="array",
+     *                 @OA\Items(ref=@Model(type=Joke::class))
+     *             )
      *         )
      *     ),
      *
@@ -265,19 +277,23 @@ class JokeController extends AbstractController
 
         $jokeCollection = [];
 
-        $limit  = 1;
-        $offset = 0;
-
-        $limit = $request->query->get('limit');
-        if ( ! is_numeric($limit) ) {
+        $validationErrors = [];
+        foreach( ['page', 'itemsPerPage'] as $param ) {
+            if ( ! is_numeric($request->query->get($param)) ) {
+                $validationErrors[] = "Missing or invalid '{$param}' query parameter.";
+            }
+            if ( $request->query->get($param) < 1 ) {
+                $validationErrors[] = "'{$param}' must be greater than 0.";
+            }
+        }
+        if ( ! empty($validationErrors) ) {
             $response->setStatusCode(400);
-            $response->setData('Missing or invalid "limit" query parameter.');
+            $response->setData(implode("\n", $validationErrors));
             return $response;
         }
 
-        if ( is_numeric($request->query->get('offset')) ) {
-            $offset = $request->query->get('offset');
-        }
+        $offset = ($request->query->get('page') - 1) * $request->query->get('itemsPerPage');
+        $limit  = $request->query->get('itemsPerPage');
 
         // Retrieve jokes
         $records = $this->getDoctrine()
@@ -294,9 +310,17 @@ class JokeController extends AbstractController
         foreach( $records as $record ) {
             $jokeCollection[] = $record->toArray();
         }
+        $responseData = [
+            'meta' => [
+                'page'         => $request->query->get('page'),
+                'itemsPerPage' => $request->query->get('itemsPerPage'),
+                'total'        => count($jokeCollection)
+            ],
+            'jokes' => $jokeCollection
+        ];
 
         $response->setStatusCode(200);
-        $response->setData($jokeCollection);
+        $response->setData($responseData);
 
         return $response;
     }
