@@ -1,0 +1,10 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: My Joke Api
+            description: Manages Jokes!
+            version: 0.1.0
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/joke
+#            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
