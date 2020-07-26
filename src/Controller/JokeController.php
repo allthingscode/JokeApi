@@ -4,20 +4,19 @@
 namespace App\Controller;
 
 use App\Entity\Joke;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations AS OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 
-//@OA\Info(title="My Joke API", version="0.1")
 /**
  * Class JokeController
  * @package App\Controller
  */
 class JokeController extends AbstractController
 {
-
     /**
      * @OA\Post(
      *
@@ -37,7 +36,7 @@ class JokeController extends AbstractController
      *         )
      *     ),
      *
-     *     @OA\Response(response="200", description="Joke added successfully"),
+     *     @OA\Response(response="200", description="Joke Added Successfully"),
      *     @OA\Response(response="400", description="Request is Not Valid")
      *
      * )
@@ -92,7 +91,12 @@ class JokeController extends AbstractController
      *         )
      *     ),
      *
-     *     @OA\Response(response="200", description="Joke updated successfully"),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Joke Updated Successfully",
+     *         @Model(type=Joke::class)
+     *     ),
+     *
      *     @OA\Response(response="400", description="Request is Not Valid"),
      *     @OA\Response(response="404", description="Joke Not Found")
      *
@@ -147,7 +151,12 @@ class JokeController extends AbstractController
      *
      *     @OA\Parameter(name="jokeId", required=true, in="path", type="integer"),
      *
-     *     @OA\Response(response="200", description="Joke retrieved successfully"),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Joke Retrieved Successfully",
+     *         @Model(type=Joke::class)
+     *     ),
+     *
      *     @OA\Response(response="400", description="Request is Not Valid"),
      *     @OA\Response(response="404", description="Joke Not Found")
      *
@@ -184,7 +193,12 @@ class JokeController extends AbstractController
      *     description="Get a Random Joke",
      *     operationId="Get Any Joke",
      *
-     *     @OA\Response(response="200", description="Joke retrieved successfully"),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Joke Retrieved Successfully",
+     *         @Model(type=Joke::class)
+     *     ),
+     *
      *     @OA\Response(response="400", description="Request is Not Valid")
      *
      * )
@@ -214,6 +228,75 @@ class JokeController extends AbstractController
 
         $response->setStatusCode(200);
         $response->setData($joke->toArray());
+
+        return $response;
+    }
+
+
+    /**
+     *
+     * @OA\Get(
+     *
+     *     path="/jokes",
+     *     description="Get a Collection of Jokes",
+     *     operationId="Get Jokes",
+     *
+     *     @OA\Parameter(name="limit",  required=true,  in="query", type="integer"),
+     *     @OA\Parameter(name="offset", required=false, in="query", type="integer", default=0),
+     *
+     *     @OA\Response(
+     *         response="200",
+     *         description="Jokes Retrieved Successfully",
+     *         @OA\Schema(type="array",
+     *             @OA\Items(ref=@Model(type=Joke::class))
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response="400", description="Request is Not Valid")
+     * )
+     *
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getCollection( Request $request )
+    {
+        $response = new JsonResponse();
+
+        $jokeCollection = [];
+
+        $limit  = 1;
+        $offset = 0;
+
+        $limit = $request->query->get('limit');
+        if ( ! is_numeric($limit) ) {
+            $response->setStatusCode(400);
+            $response->setData('Missing or invalid "limit" query parameter.');
+            return $response;
+        }
+
+        if ( is_numeric($request->query->get('offset')) ) {
+            $offset = $request->query->get('offset');
+        }
+
+        // Retrieve jokes
+        $records = $this->getDoctrine()
+            ->getRepository(Joke::class)
+            ->findBy(
+                [],
+                ['id' => 'ASC'],
+                $limit,
+                $offset
+            )
+        ;
+
+        // Assemble our response
+        foreach( $records as $record ) {
+            $jokeCollection[] = $record->toArray();
+        }
+
+        $response->setStatusCode(200);
+        $response->setData($jokeCollection);
 
         return $response;
     }

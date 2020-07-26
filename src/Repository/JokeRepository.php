@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace App\Repository;
 
 use App\Entity\Joke;
@@ -14,6 +12,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  */
 class JokeRepository extends ServiceEntityRepository
 {
+    /**
+     * JokeRepository constructor.
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Joke::class);

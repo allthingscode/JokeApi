@@ -8,6 +8,7 @@ app.swagger_ui:
     methods: GET
     defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
 
+
 ## Joke Routes
 
 api.joke.get:
@@ -41,3 +42,7 @@ api.joke.post:
     controller: App\Controller\JokeController::add
     methods:  POST
 
+api.joke.getCollection:
+    path: /jokes
+    controller: App\Controller\JokeController::getCollection
+    methods:  GET
